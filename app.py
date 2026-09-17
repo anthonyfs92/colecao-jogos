@@ -76,10 +76,10 @@ def carregar_jogos():
     return resp.json() if texto else []
 
 
-def adicionar_jogo(nome, valor_pago):
+def adicionar_jogo(nome):
     resp = requests.post(
         ADICIONAR_URL,
-        json={"nome": nome, "valor_pago": valor_pago},
+        json={"nome": nome},
         timeout=90,
     )
     resp.raise_for_status()
@@ -126,10 +126,9 @@ def renderizar_detalhe(jogo):
         st.markdown(f'<div class="detail-meta">📂 {categoria}</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="detail-meta">📅 Ano: {ano}  ·  🏭 Editora: {editora}</div>', unsafe_allow_html=True)
 
-        pago = parse_valor(jogo.get("valor_pago"))
         mercado = parse_valor(jogo.get("valor_mercado_estimado"))
         st.markdown(
-            f'<div class="detail-meta">💰 Pago: R$ {pago:,.2f}  ·  📈 Mercado estimado: R$ {mercado:,.2f}</div>',
+            f'<div class="detail-meta">📈 Valor de mercado estimado: R$ {mercado:,.2f}</div>',
             unsafe_allow_html=True,
         )
 
@@ -151,9 +150,8 @@ def renderizar_lista():
     st.caption("Cadastre pelo nome — categoria, ano e valor de mercado são buscados automaticamente.")
 
     with st.form("form_adicionar", clear_on_submit=True):
-        col_nome, col_valor, col_botao = st.columns([3, 1, 1])
+        col_nome, col_botao = st.columns([4, 1])
         nome_novo = col_nome.text_input("Nome do jogo", placeholder="Ex: Catan")
-        valor_novo = col_valor.number_input("Valor pago (R$)", min_value=0.0, step=10.0, format="%.2f")
         col_botao.markdown("<div style='height: 28px'></div>", unsafe_allow_html=True)
         enviar = col_botao.form_submit_button("➕ Adicionar")
 
@@ -163,7 +161,7 @@ def renderizar_lista():
         else:
             with st.spinner(f"Buscando informações de '{nome_novo}'..."):
                 try:
-                    adicionar_jogo(nome_novo.strip(), valor_novo)
+                    adicionar_jogo(nome_novo.strip())
                     st.session_state.pop("jogos", None)
                     st.success(f"'{nome_novo}' adicionado à coleção!")
                     st.rerun()
@@ -175,15 +173,13 @@ def renderizar_lista():
         st.rerun()
 
     total_jogos = len(jogos)
-    total_investido = sum(parse_valor(j.get("valor_pago")) for j in jogos)
-    valor_medio = total_investido / total_jogos if total_jogos else 0.0
     total_mercado = sum(parse_valor(j.get("valor_mercado_estimado")) for j in jogos)
+    valor_medio = total_mercado / total_jogos if total_jogos else 0.0
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
     c1.metric("🎲 Jogos na coleção", total_jogos)
-    c2.metric("💰 Total investido", f"R$ {total_investido:,.2f}")
-    c3.metric("📊 Valor médio por jogo", f"R$ {valor_medio:,.2f}")
-    c4.metric("📈 Valor de mercado estimado", f"R$ {total_mercado:,.2f}")
+    c2.metric("📈 Valor de mercado estimado", f"R$ {total_mercado:,.2f}")
+    c3.metric("📊 Valor médio de mercado por jogo", f"R$ {valor_medio:,.2f}")
 
     st.divider()
 
