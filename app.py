@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 
 st.set_page_config(page_title="Coleção de Jogos", page_icon="🎲", layout="wide")
@@ -140,9 +141,12 @@ def renderizar_detalhe(jogo):
         if descricao:
             st.markdown(f'<div class="detail-desc">{descricao}</div>', unsafe_allow_html=True)
 
-        manual = jogo.get("manual_url") or ""
-        if manual:
-            st.link_button("📖 Abrir manual / página BGG", manual)
+    manual = jogo.get("manual_url") or ""
+    if manual:
+        st.divider()
+        st.subheader("📖 Manual / regras")
+        components.iframe(manual, height=700, scrolling=True)
+        st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
 
 
 def renderizar_lista():
