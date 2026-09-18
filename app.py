@@ -70,6 +70,22 @@ def parse_valor(v):
         return 0.0
 
 
+PARTY_KEYWORDS = [
+    "festa", "party", "musical", "imaginação", "imaginacao", "destreza",
+    "agilidade", "trivia", "perguntas", "conhecimentos gerais", "adivinh",
+]
+COLABORATIVO_KEYWORDS = ["cooperativ", "colaborat"]
+
+
+def classificar_tipo(categoria):
+    c = (categoria or "").lower()
+    if any(k in c for k in COLABORATIVO_KEYWORDS):
+        return "Colaborativo"
+    if any(k in c for k in PARTY_KEYWORDS):
+        return "Party Game"
+    return "Estratégia"
+
+
 def carregar_jogos():
     resp = requests.get(LISTAR_URL, timeout=15)
     resp.raise_for_status()
@@ -195,25 +211,33 @@ def renderizar_lista():
         st.info("Nenhum jogo cadastrado ainda. Adicione o primeiro usando o formulário acima.")
         return
 
-    categorias = {}
-    for j in jogos:
-        cat = (j.get("categoria") or "").strip() or "Sem categoria"
-        categorias.setdefault(cat, []).append(j)
+    filtro = st.radio(
+        "Filtrar por tipo",
+        ["Todos", "Estratégia", "Party Game", "Colaborativo"],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
 
-    for categoria in sorted(categorias.keys()):
-        lista = categorias[categoria]
-        st.subheader(f"{categoria} · {len(lista)} jogo(s)")
-        cols = st.columns(5)
-        for i, jogo in enumerate(lista):
-            with cols[i % 5]:
-                imagem = jogo.get("imagem_url") or ""
-                if imagem:
-                    st.markdown(f'<div class="tile-img"><img src="{imagem}"></div>', unsafe_allow_html=True)
-                else:
-                    st.markdown('<div class="tile-img-placeholder">🎲</div>', unsafe_allow_html=True)
-                if st.button(jogo.get("nome", ""), key=f"tile_{jogo.get('id')}", use_container_width=True):
-                    st.session_state.jogo_selecionado = jogo.get("id")
-                    st.rerun()
+    if filtro == "Todos":
+        lista = jogos
+    else:
+        lista = [j for j in jogos if classificar_tipo(j.get("categoria")) == filtro]
+
+    if not lista:
+        st.info("Nenhum jogo nessa categoria ainda.")
+        return
+
+    cols = st.columns(5)
+    for i, jogo in enumerate(lista):
+        with cols[i % 5]:
+            imagem = jogo.get("imagem_url") or ""
+            if imagem:
+                st.markdown(f'<div class="tile-img"><img src="{imagem}"></div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="tile-img-placeholder">🎲</div>', unsafe_allow_html=True)
+            if st.button(jogo.get("nome", ""), key=f"tile_{jogo.get('id')}", use_container_width=True):
+                st.session_state.jogo_selecionado = jogo.get("id")
+                st.rerun()
 
 
 if st.session_state.jogo_selecionado is not None:
