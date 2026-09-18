@@ -7,6 +7,7 @@ st.set_page_config(page_title="Coleção de Jogos", page_icon="🎲", layout="wi
 N8N_BASE_URL = st.secrets.get("N8N_BASE_URL", "https://34-30-243-201.sslip.io")
 LISTAR_URL = f"{N8N_BASE_URL}/webhook/jogos-listar"
 ADICIONAR_URL = f"{N8N_BASE_URL}/webhook/jogos-adicionar"
+EXCLUIR_URL = f"{N8N_BASE_URL}/webhook/jogos-excluir"
 
 PAGE_CSS = """
 <style>
@@ -102,6 +103,15 @@ def adicionar_jogo(nome):
     resp.raise_for_status()
 
 
+def excluir_jogo(jogo_id):
+    resp = requests.post(
+        EXCLUIR_URL,
+        json={"id": jogo_id},
+        timeout=30,
+    )
+    resp.raise_for_status()
+
+
 if "jogos" not in st.session_state:
     try:
         st.session_state.jogos = carregar_jogos()
@@ -168,29 +178,62 @@ def renderizar_detalhe(jogo):
             components.iframe(manual, height=700, scrolling=True)
             st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
 
+    st.divider()
+    if not st.session_state.get("confirmar_exclusao", False):
+        if st.button("🗑️ Excluir jogo da coleção"):
+            st.session_state.confirmar_exclusao = True
+            st.rerun()
+    else:
+        st.warning(f"Tem certeza que deseja excluir **{jogo.get('nome', '')}**? Essa ação não pode ser desfeita.")
+        col_sim, col_nao = st.columns(2)
+        if col_sim.button("Sim, excluir", type="primary", use_container_width=True):
+            try:
+                excluir_jogo(jogo.get("id"))
+                st.session_state.pop("jogos", None)
+                st.session_state.jogo_selecionado = None
+                st.session_state.confirmar_exclusao = False
+                st.success("Jogo excluído da coleção.")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Não consegui excluir: {e}")
+        if col_nao.button("Cancelar", use_container_width=True):
+            st.session_state.confirmar_exclusao = False
+            st.rerun()
+
 
 def renderizar_lista():
     st.title("🎲 Coleção de Jogos de Tabuleiro")
     st.caption("Cadastre pelo nome — categoria, ano e valor de mercado são buscados automaticamente.")
 
-    with st.form("form_adicionar", clear_on_submit=True):
-        col_nome, col_botao = st.columns([4, 1])
-        nome_novo = col_nome.text_input("Nome do jogo", placeholder="Ex: Catan")
-        col_botao.markdown("<div style='height: 28px'></div>", unsafe_allow_html=True)
-        enviar = col_botao.form_submit_button("➕ Adicionar")
+    col_busca, col_add = st.columns([4, 1])
+    busca = col_busca.text_input(
+        "Buscar na coleção",
+        placeholder="🔍 Buscar pelo nome de um jogo já cadastrado...",
+        label_visibility="collapsed",
+    )
+    if col_add.button("➕ Adicionar", use_container_width=True):
+        st.session_state.mostrar_form_adicionar = not st.session_state.get("mostrar_form_adicionar", False)
 
-    if enviar:
-        if not nome_novo.strip():
-            st.warning("Digite o nome do jogo.")
-        else:
-            with st.spinner(f"Buscando informações de '{nome_novo}'..."):
-                try:
-                    adicionar_jogo(nome_novo.strip())
-                    st.session_state.pop("jogos", None)
-                    st.success(f"'{nome_novo}' adicionado à coleção!")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Não consegui adicionar: {e}")
+    if st.session_state.get("mostrar_form_adicionar", False):
+        with st.form("form_adicionar", clear_on_submit=True):
+            col_nome, col_botao = st.columns([4, 1])
+            nome_novo = col_nome.text_input("Nome do novo jogo", placeholder="Ex: Catan")
+            col_botao.markdown("<div style='height: 28px'></div>", unsafe_allow_html=True)
+            enviar = col_botao.form_submit_button("Buscar e adicionar")
+
+        if enviar:
+            if not nome_novo.strip():
+                st.warning("Digite o nome do jogo.")
+            else:
+                with st.spinner(f"Buscando informações de '{nome_novo}'..."):
+                    try:
+                        adicionar_jogo(nome_novo.strip())
+                        st.session_state.pop("jogos", None)
+                        st.session_state.mostrar_form_adicionar = False
+                        st.success(f"'{nome_novo}' adicionado à coleção!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Não consegui adicionar: {e}")
 
     if st.button("🔄 Atualizar lista"):
         st.session_state.pop("jogos", None)
@@ -223,8 +266,12 @@ def renderizar_lista():
     else:
         lista = [j for j in jogos if classificar_tipo(j.get("categoria")) == filtro]
 
+    if busca.strip():
+        termo = busca.strip().lower()
+        lista = [j for j in lista if termo in (j.get("nome") or "").lower()]
+
     if not lista:
-        st.info("Nenhum jogo nessa categoria ainda.")
+        st.info("Nenhum jogo encontrado.")
         return
 
     cols = st.columns(5)
