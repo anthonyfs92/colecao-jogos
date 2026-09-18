@@ -1,8 +1,7 @@
-import base64
-
 import streamlit as st
 import streamlit.components.v1 as components
 import requests
+from streamlit_pdf_viewer import pdf_viewer
 
 st.set_page_config(page_title="Coleção de Jogos", page_icon="🎲", layout="wide")
 
@@ -106,10 +105,10 @@ def adicionar_jogo(nome):
 
 
 @st.cache_data(show_spinner=False, ttl=3600)
-def buscar_pdf_base64(url):
+def buscar_pdf_bytes(url):
     resp = requests.get(url, timeout=60)
     resp.raise_for_status()
-    return base64.b64encode(resp.content).decode("utf-8")
+    return resp.content
 
 
 def excluir_jogo(jogo_id):
@@ -192,8 +191,8 @@ def renderizar_detalhe(jogo):
             elif "/webhook/jogos-manual-pdf" in manual:
                 try:
                     with st.spinner("Carregando manual..."):
-                        pdf_b64 = buscar_pdf_base64(manual)
-                    components.iframe(f"data:application/pdf;base64,{pdf_b64}", height=700, scrolling=True)
+                        pdf_bytes = buscar_pdf_bytes(manual)
+                    pdf_viewer(pdf_bytes, height=700)
                 except Exception as e:
                     st.error(f"Não consegui carregar o manual: {e}")
                     st.link_button("Abrir manual em uma nova aba", manual)
