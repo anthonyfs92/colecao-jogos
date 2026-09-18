@@ -329,22 +329,19 @@ def renderizar_lista():
 
     st.divider()
 
-    col_filtro, col_cartas = st.columns([4, 1])
-    filtro = col_filtro.radio(
+    filtro = st.radio(
         "Filtrar por tipo",
-        ["Todos", "Estratégia", "Party Game", "Colaborativo"],
+        ["Todos", "Estratégia", "Party Game", "Colaborativo", "🃏 Jogos de Cartas"],
         horizontal=True,
         label_visibility="collapsed",
     )
-    somente_cartas = col_cartas.checkbox("🃏 Só cartas")
 
     if filtro == "Todos":
         lista = jogos
+    elif filtro == "🃏 Jogos de Cartas":
+        lista = [j for j in jogos if eh_jogo_de_cartas(j.get("categoria"))]
     else:
         lista = [j for j in jogos if classificar_tipo(j.get("categoria")) == filtro]
-
-    if somente_cartas:
-        lista = [j for j in lista if eh_jogo_de_cartas(j.get("categoria"))]
 
     if busca.strip():
         termo = busca.strip().lower()
