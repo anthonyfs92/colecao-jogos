@@ -168,15 +168,21 @@ def renderizar_detalhe(jogo):
             st.markdown(f'<div class="detail-desc">{descricao}</div>', unsafe_allow_html=True)
 
     manual = jogo.get("manual_url") or ""
-    if manual:
+    imagem_manual = jogo.get("imagem_manual_url") or ""
+    if manual or imagem_manual:
         st.divider()
         st.subheader("📖 Manual / regras")
-        if "boardgamegeek.com" in manual:
-            st.caption("Esse manual está hospedado no BoardGameGeek, que não permite ser exibido incorporado nesta página.")
-            st.link_button("Abrir manual no BoardGameGeek", manual)
-        else:
-            components.iframe(manual, height=700, scrolling=True)
-            st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
+
+        if imagem_manual:
+            st.image(imagem_manual, use_container_width=True, caption="Foto do manual/regras original")
+
+        if manual:
+            if "boardgamegeek.com" in manual:
+                st.caption("Esse link está hospedado no BoardGameGeek, que não permite ser exibido incorporado nesta página.")
+                st.link_button("Abrir manual no BoardGameGeek", manual)
+            else:
+                components.iframe(manual, height=700, scrolling=True)
+                st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
 
     st.divider()
     if not st.session_state.get("confirmar_exclusao", False):
