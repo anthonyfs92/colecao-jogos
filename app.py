@@ -1,3 +1,5 @@
+import base64
+
 import streamlit as st
 import streamlit.components.v1 as components
 import requests
@@ -103,6 +105,13 @@ def adicionar_jogo(nome):
     resp.raise_for_status()
 
 
+@st.cache_data(show_spinner=False, ttl=3600)
+def buscar_pdf_base64(url):
+    resp = requests.get(url, timeout=60)
+    resp.raise_for_status()
+    return base64.b64encode(resp.content).decode("utf-8")
+
+
 def excluir_jogo(jogo_id):
     resp = requests.post(
         EXCLUIR_URL,
@@ -180,6 +189,14 @@ def renderizar_detalhe(jogo):
             if "boardgamegeek.com" in manual:
                 st.caption("Esse link está hospedado no BoardGameGeek, que não permite ser exibido incorporado nesta página.")
                 st.link_button("Abrir manual no BoardGameGeek", manual)
+            elif "/webhook/jogos-manual-pdf" in manual:
+                try:
+                    with st.spinner("Carregando manual..."):
+                        pdf_b64 = buscar_pdf_base64(manual)
+                    components.iframe(f"data:application/pdf;base64,{pdf_b64}", height=700, scrolling=True)
+                except Exception as e:
+                    st.error(f"Não consegui carregar o manual: {e}")
+                    st.link_button("Abrir manual em uma nova aba", manual)
             else:
                 components.iframe(manual, height=700, scrolling=True)
                 st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
