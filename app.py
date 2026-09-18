@@ -180,6 +180,9 @@ def renderizar_detalhe(jogo):
             if "boardgamegeek.com" in manual:
                 st.caption("Esse link está hospedado no BoardGameGeek, que não permite ser exibido incorporado nesta página.")
                 st.link_button("Abrir manual no BoardGameGeek", manual)
+            elif "mundogalapagos.com.br" in manual:
+                st.caption("Manual oficial da Galápagos/Asmodee Brasil (arquivo .zip com o livro de regras).")
+                st.link_button("📥 Baixar manual (.zip)", manual)
             else:
                 components.iframe(manual, height=700, scrolling=True)
                 st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
