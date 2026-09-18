@@ -3,19 +3,39 @@ import streamlit.components.v1 as components
 import requests
 from streamlit_pdf_viewer import pdf_viewer
 
-st.set_page_config(page_title="Coleção de Jogos", page_icon="🎲", layout="wide")
+st.set_page_config(page_title="Catálogo Bruna BoardGames", page_icon="🎲", layout="wide")
 
 N8N_BASE_URL = st.secrets.get("N8N_BASE_URL", "https://34-30-243-201.sslip.io")
 LISTAR_URL = f"{N8N_BASE_URL}/webhook/jogos-listar"
 ADICIONAR_URL = f"{N8N_BASE_URL}/webhook/jogos-adicionar"
 EXCLUIR_URL = f"{N8N_BASE_URL}/webhook/jogos-excluir"
 
+EVERDELL_BG = "https://www.asmodee.com.br/ccstore/v1/images/?source=/file/v6043660316755844588/products/EVE001_3D.png"
+
 PAGE_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap');
 [data-testid="stAppViewContainer"] {
-    background: radial-gradient(circle at 15% 0%, #16221f 0%, #0e1412 60%);
+    background:
+        linear-gradient(rgba(8,13,11,0.90), rgba(8,13,11,0.94)),
+        url('__EVERDELL_BG__');
+    background-size: 420px, cover;
+    background-position: top right, center;
+    background-repeat: no-repeat, no-repeat;
+    background-attachment: fixed, fixed;
 }
 [data-testid="stHeader"] { background: transparent; }
+h1.app-title {
+    font-family: 'Berkshire Swash', cursive;
+    font-weight: 400;
+    font-size: 3.2rem;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #f2c14e, #4fd1a5 65%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+}
 h1 {
     font-weight: 800;
     letter-spacing: -0.5px;
@@ -62,7 +82,7 @@ div[data-testid="column"] div[data-testid="stButton"] button {
 button { border-radius: 10px !important; }
 </style>
 """
-st.markdown(PAGE_CSS, unsafe_allow_html=True)
+st.markdown(PAGE_CSS.replace("__EVERDELL_BG__", EVERDELL_BG), unsafe_allow_html=True)
 
 
 def parse_valor(v):
@@ -77,6 +97,7 @@ PARTY_KEYWORDS = [
     "agilidade", "trivia", "perguntas", "conhecimentos gerais", "adivinh",
 ]
 COLABORATIVO_KEYWORDS = ["cooperativ", "colaborat"]
+CARTAS_KEYWORDS = ["carta", "card"]
 
 
 def classificar_tipo(categoria):
@@ -86,6 +107,11 @@ def classificar_tipo(categoria):
     if any(k in c for k in PARTY_KEYWORDS):
         return "Party Game"
     return "Estratégia"
+
+
+def eh_jogo_de_cartas(categoria):
+    c = (categoria or "").lower()
+    return any(k in c for k in CARTAS_KEYWORDS)
 
 
 def carregar_jogos():
@@ -224,7 +250,7 @@ def renderizar_detalhe(jogo):
 
 
 def renderizar_lista():
-    st.title("🎲 Coleção de Jogos de Tabuleiro")
+    st.markdown('<h1 class="app-title">🌳 Catálogo Bruna BoardGames</h1>', unsafe_allow_html=True)
     st.caption("Cadastre pelo nome — categoria, ano e valor de mercado são buscados automaticamente.")
 
     col_busca, col_add = st.columns([4, 1])
@@ -276,21 +302,55 @@ def renderizar_lista():
         st.info("Nenhum jogo cadastrado ainda. Adicione o primeiro usando o formulário acima.")
         return
 
-    filtro = st.radio(
+    with st.expander("📊 Destaques do catálogo"):
+        d1, d2, d3 = st.columns(3)
+
+        com_valor = [j for j in jogos if parse_valor(j.get("valor_mercado_estimado")) > 0]
+        mais_caros = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")), reverse=True)[:5]
+        mais_baratos = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")))[:5]
+        com_nota = [j for j in jogos if parse_valor(j.get("bgg_nota")) > 0]
+        melhor_avaliados = sorted(com_nota, key=lambda j: parse_valor(j.get("bgg_nota")), reverse=True)[:5]
+
+        with d1:
+            st.markdown("**💰 Top 5 valor mais alto**")
+            for j in mais_caros:
+                st.markdown(f"- {j.get('nome')} — R$ {parse_valor(j.get('valor_mercado_estimado')):,.2f}")
+        with d2:
+            st.markdown("**💸 Top 5 valor mais baixo**")
+            for j in mais_baratos:
+                st.markdown(f"- {j.get('nome')} — R$ {parse_valor(j.get('valor_mercado_estimado')):,.2f}")
+        with d3:
+            st.markdown("**⭐ Top 5 mais bem avaliados (BGG)**")
+            if melhor_avaliados:
+                for j in melhor_avaliados:
+                    st.markdown(f"- {j.get('nome')} — nota {j.get('bgg_nota')}")
+            else:
+                st.caption("Ainda sem notas do BGG cadastradas para nenhum jogo da coleção.")
+
+    st.divider()
+
+    col_filtro, col_cartas = st.columns([4, 1])
+    filtro = col_filtro.radio(
         "Filtrar por tipo",
         ["Todos", "Estratégia", "Party Game", "Colaborativo"],
         horizontal=True,
         label_visibility="collapsed",
     )
+    somente_cartas = col_cartas.checkbox("🃏 Só cartas")
 
     if filtro == "Todos":
         lista = jogos
     else:
         lista = [j for j in jogos if classificar_tipo(j.get("categoria")) == filtro]
 
+    if somente_cartas:
+        lista = [j for j in lista if eh_jogo_de_cartas(j.get("categoria"))]
+
     if busca.strip():
         termo = busca.strip().lower()
         lista = [j for j in lista if termo in (j.get("nome") or "").lower()]
+
+    lista = sorted(lista, key=lambda j: (j.get("nome") or "").lower())
 
     if not lista:
         st.info("Nenhum jogo encontrado.")
