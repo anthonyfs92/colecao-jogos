@@ -145,8 +145,12 @@ def renderizar_detalhe(jogo):
     if manual:
         st.divider()
         st.subheader("📖 Manual / regras")
-        components.iframe(manual, height=700, scrolling=True)
-        st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
+        if "boardgamegeek.com" in manual:
+            st.caption("Esse manual está hospedado no BoardGameGeek, que não permite ser exibido incorporado nesta página.")
+            st.link_button("Abrir manual no BoardGameGeek", manual)
+        else:
+            components.iframe(manual, height=700, scrolling=True)
+            st.caption(f"Se o manual não aparecer acima (alguns sites bloqueiam a exibição incorporada), [abra em uma nova aba]({manual}).")
 
 
 def renderizar_lista():
