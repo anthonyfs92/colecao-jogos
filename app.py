@@ -1,3 +1,6 @@
+import base64
+from pathlib import Path
+
 import streamlit as st
 import streamlit.components.v1 as components
 import requests
@@ -10,32 +13,29 @@ LISTAR_URL = f"{N8N_BASE_URL}/webhook/jogos-listar"
 ADICIONAR_URL = f"{N8N_BASE_URL}/webhook/jogos-adicionar"
 EXCLUIR_URL = f"{N8N_BASE_URL}/webhook/jogos-excluir"
 
-EVERDELL_BG = "https://www.asmodee.com.br/ccstore/v1/images/?source=/file/v6043660316755844588/products/EVE001_3D.png"
+ASSETS_DIR = Path(__file__).parent / "assets"
+HEADER_IMG = ASSETS_DIR / "header.png"
+BACKGROUND_IMG = ASSETS_DIR / "background.jpg"
+
+
+@st.cache_data(show_spinner=False)
+def imagem_para_base64(caminho):
+    return base64.b64encode(Path(caminho).read_bytes()).decode("utf-8")
+
+
+BACKGROUND_B64 = imagem_para_base64(BACKGROUND_IMG)
 
 PAGE_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap');
 [data-testid="stAppViewContainer"] {
     background:
-        linear-gradient(rgba(8,13,11,0.90), rgba(8,13,11,0.94)),
-        url('__EVERDELL_BG__');
-    background-size: 420px, cover;
-    background-position: top right, center;
-    background-repeat: no-repeat, no-repeat;
-    background-attachment: fixed, fixed;
+        linear-gradient(rgba(8,13,11,0.55), rgba(8,13,11,0.78)),
+        url('data:image/jpeg;base64,__BACKGROUND_B64__');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 [data-testid="stHeader"] { background: transparent; }
-h1.app-title {
-    font-family: 'Berkshire Swash', cursive;
-    font-weight: 400;
-    font-size: 3.2rem;
-    letter-spacing: 1px;
-    background: linear-gradient(90deg, #f2c14e, #4fd1a5 65%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 2px 18px rgba(0,0,0,0.35);
-}
 h1 {
     font-weight: 800;
     letter-spacing: -0.5px;
@@ -82,7 +82,7 @@ div[data-testid="column"] div[data-testid="stButton"] button {
 button { border-radius: 10px !important; }
 </style>
 """
-st.markdown(PAGE_CSS.replace("__EVERDELL_BG__", EVERDELL_BG), unsafe_allow_html=True)
+st.markdown(PAGE_CSS.replace("__BACKGROUND_B64__", BACKGROUND_B64), unsafe_allow_html=True)
 
 
 def parse_valor(v):
@@ -250,7 +250,7 @@ def renderizar_detalhe(jogo):
 
 
 def renderizar_lista():
-    st.markdown('<h1 class="app-title">🌳 Catálogo Bruna BoardGames</h1>', unsafe_allow_html=True)
+    st.image(str(HEADER_IMG), use_container_width=True)
     st.caption("Cadastre pelo nome — categoria, ano e valor de mercado são buscados automaticamente.")
 
     col_busca, col_add = st.columns([4, 1])
