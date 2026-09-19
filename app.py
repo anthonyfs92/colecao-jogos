@@ -32,12 +32,13 @@ PAGE_CSS = """
 :root {
     --panel-bg: #232b27;
     --panel-bg-2: #2a332e;
-    --wood-border: repeating-linear-gradient(135deg,
-        #3a2513 0px, #6b4423 2px, #a9773e 4px, #c99456 5px, #a9773e 6px, #6b4423 8px, #3a2513 10px);
     --wood-shadow:
+        0 0 0 2px #3a2513,
+        0 0 0 4px #a9773e,
+        0 0 0 5px #3a2513,
         inset 0 1.5px 2px rgba(255,214,150,0.25),
         inset 0 -2px 4px rgba(0,0,0,0.5),
-        0 5px 12px rgba(0,0,0,0.5);
+        0 6px 14px rgba(0,0,0,0.5);
 }
 
 html, body, [class*="css"] {
@@ -66,8 +67,7 @@ h1, h2, h3 {
 [data-testid="stCaptionContainer"] { color: #b9c9c0 !important; }
 div[data-testid="stMetric"] {
     background: var(--panel-bg);
-    border: 4px solid transparent;
-    border-image: var(--wood-border) 6;
+    border: none;
     border-radius: 14px;
     padding: 14px 16px;
     position: relative;
@@ -94,8 +94,7 @@ h3 {
     padding: 9px;
     border-radius: 16px;
     background: var(--panel-bg);
-    border: 4px solid transparent;
-    border-image: var(--wood-border) 6;
+    border: none;
     box-shadow: var(--wood-shadow);
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     margin-bottom: 4px;
@@ -145,8 +144,7 @@ button, input, textarea, select, .stTextInput, .stButton, .stRadio label, .stChe
 button {
     border-radius: 10px !important;
     background: var(--panel-bg) !important;
-    border: 4px solid transparent !important;
-    border-image: var(--wood-border) 6 !important;
+    border: none !important;
     box-shadow: var(--wood-shadow) !important;
 }
 div[data-testid="stTextInput"] div[data-baseweb="input"],
@@ -154,8 +152,7 @@ div[data-testid="stTextInputRootElement"],
 .stTextInput > div > div,
 div[data-testid="stTextInput"] > div {
     background: var(--panel-bg) !important;
-    border: 4px solid transparent !important;
-    border-image: var(--wood-border) 6 !important;
+    border: none !important;
     border-radius: 10px !important;
     box-shadow: var(--wood-shadow) !important;
 }
@@ -165,8 +162,7 @@ div[data-testid="stTextInput"] input {
 }
 div[data-testid="stForm"] {
     background: var(--panel-bg) !important;
-    border: 4px solid transparent !important;
-    border-image: var(--wood-border) 6 !important;
+    border: none !important;
     border-radius: 14px !important;
     padding: 16px;
     box-shadow: var(--wood-shadow) !important;
@@ -175,8 +171,7 @@ div[data-testid="stExpander"],
 div[data-testid="stExpander"] details,
 div[data-testid="stExpander"] > div {
     background: var(--panel-bg) !important;
-    border: 4px solid transparent !important;
-    border-image: var(--wood-border) 6 !important;
+    border: none !important;
     border-radius: 14px !important;
     box-shadow: var(--wood-shadow) !important;
 }
