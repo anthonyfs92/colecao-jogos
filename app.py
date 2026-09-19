@@ -47,10 +47,22 @@ h1 {
 [data-testid="stCaptionContainer"] { color: #8b9c96 !important; }
 div[data-testid="stMetric"] {
     background: #142019;
-    border: 1px solid rgba(79,209,165,0.18);
+    border: 4px solid transparent;
+    border-image: repeating-linear-gradient(135deg, #6b4423 0 7px, #8b5a2b 7px 14px, #4a3018 14px 21px) 7;
     border-radius: 14px;
     padding: 14px 16px;
+    position: relative;
 }
+div[data-testid="stMetric"]::before, div[data-testid="stMetric"]::after {
+    content: '🌿';
+    position: absolute;
+    font-size: 1.1rem;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+    pointer-events: none;
+    z-index: 2;
+}
+div[data-testid="stMetric"]::before { top: -11px; left: -9px; transform: rotate(-30deg); }
+div[data-testid="stMetric"]::after { content: '🍂'; bottom: -11px; right: -9px; transform: rotate(150deg); }
 div[data-testid="stMetricLabel"] { color: #9fb8ae !important; }
 h3 {
     border-bottom: 1px solid rgba(242,193,78,0.25);
@@ -59,18 +71,19 @@ h3 {
 }
 .tile-card {
     position: relative;
-    padding: 8px;
+    padding: 9px;
     border-radius: 16px;
     background: linear-gradient(160deg, #1c2a22, #131d17);
-    border: 1px solid rgba(242,193,78,0.28);
+    border: 4px solid transparent;
+    border-image: repeating-linear-gradient(135deg, #6b4423 0 6px, #8b5a2b 6px 12px, #4a3018 12px 18px) 6;
     box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     margin-bottom: 4px;
 }
 .tile-card:hover {
     transform: translateY(-3px) scale(1.015);
     box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-    border-color: rgba(79,209,165,0.6);
+    filter: brightness(1.12);
 }
 .tile-card::before, .tile-card::after {
     content: '🌿';
