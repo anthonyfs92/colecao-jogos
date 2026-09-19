@@ -27,6 +27,18 @@ BACKGROUND_B64 = imagem_para_base64(BACKGROUND_IMG)
 
 PAGE_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Alegreya:wght@500;700&display=swap');
+
+:root {
+    --panel-bg: #3d4a44;
+    --panel-bg-2: #46534c;
+    --wood-border: repeating-linear-gradient(135deg, #6b4423 0 6px, #8b5a2b 6px 12px, #4a3018 12px 18px);
+}
+
+html, body, [class*="css"] {
+    font-family: 'Alegreya', serif !important;
+}
+
 [data-testid="stAppViewContainer"] {
     background:
         linear-gradient(rgba(8,13,11,0.55), rgba(8,13,11,0.78)),
@@ -36,19 +48,20 @@ PAGE_CSS = """
     background-attachment: fixed;
 }
 [data-testid="stHeader"] { background: transparent; }
-h1 {
-    font-weight: 800;
-    letter-spacing: -0.5px;
+h1, h2, h3 {
+    font-family: 'Berkshire Swash', cursive !important;
+    font-weight: 400;
+    letter-spacing: 0.5px;
     background: linear-gradient(90deg, #f2c14e, #4fd1a5 65%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
-[data-testid="stCaptionContainer"] { color: #8b9c96 !important; }
+[data-testid="stCaptionContainer"] { color: #b9c9c0 !important; }
 div[data-testid="stMetric"] {
-    background: #142019;
+    background: var(--panel-bg);
     border: 4px solid transparent;
-    border-image: repeating-linear-gradient(135deg, #6b4423 0 7px, #8b5a2b 7px 14px, #4a3018 14px 21px) 7;
+    border-image: var(--wood-border) 7;
     border-radius: 14px;
     padding: 14px 16px;
     position: relative;
@@ -63,19 +76,19 @@ div[data-testid="stMetric"]::before, div[data-testid="stMetric"]::after {
 }
 div[data-testid="stMetric"]::before { top: -11px; left: -9px; transform: rotate(-30deg); }
 div[data-testid="stMetric"]::after { content: '🍂'; bottom: -11px; right: -9px; transform: rotate(150deg); }
-div[data-testid="stMetricLabel"] { color: #9fb8ae !important; }
+div[data-testid="stMetricLabel"] { color: #dce8e1 !important; }
+div[data-testid="stMetricValue"] { font-family: 'Berkshire Swash', cursive !important; }
 h3 {
     border-bottom: 1px solid rgba(242,193,78,0.25);
     padding-bottom: 6px;
-    color: #f2c14e;
 }
 .tile-card {
     position: relative;
     padding: 9px;
     border-radius: 16px;
-    background: linear-gradient(160deg, #1c2a22, #131d17);
+    background: var(--panel-bg);
     border: 4px solid transparent;
-    border-image: repeating-linear-gradient(135deg, #6b4423 0 6px, #8b5a2b 6px 12px, #4a3018 12px 18px) 6;
+    border-image: var(--wood-border) 6;
     box-shadow: 0 4px 14px rgba(0,0,0,0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     margin-bottom: 4px;
@@ -103,19 +116,50 @@ h3 {
     display: block;
 }
 .tile-img-placeholder {
-    background: #1a2721;
+    background: var(--panel-bg-2);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    color: #3f544c;
+    color: #cfe0d9;
 }
 div[data-testid="column"] div[data-testid="stButton"] button {
     margin-top: -6px;
 }
-.detail-meta { color: #8b9c96; font-size: 0.95rem; margin-top: 2px; }
+.detail-meta { color: #cfe0d9; font-size: 0.95rem; margin-top: 2px; }
 .detail-desc { color: #cfe0d9; margin-top: 14px; line-height: 1.5; }
-button { border-radius: 10px !important; }
+button, input, textarea, select, .stTextInput, .stButton, .stRadio label, .stCheckbox label {
+    font-family: 'Alegreya', serif !important;
+}
+button {
+    border-radius: 10px !important;
+    background: var(--panel-bg) !important;
+    border: 4px solid transparent !important;
+    border-image: var(--wood-border) 5 !important;
+}
+div[data-testid="stTextInput"] div[data-baseweb="input"] {
+    background: var(--panel-bg) !important;
+    border: 4px solid transparent !important;
+    border-image: var(--wood-border) 5 !important;
+    border-radius: 10px !important;
+}
+div[data-testid="stTextInput"] input {
+    background: transparent !important;
+    color: #eef5f1 !important;
+}
+div[data-testid="stForm"] {
+    background: var(--panel-bg);
+    border: 4px solid transparent;
+    border-image: var(--wood-border) 7;
+    border-radius: 14px;
+    padding: 16px;
+}
+div[data-testid="stExpander"] {
+    background: var(--panel-bg);
+    border: 4px solid transparent !important;
+    border-image: var(--wood-border) 7;
+    border-radius: 14px;
+}
 </style>
 """
 st.markdown(PAGE_CSS.replace("__BACKGROUND_B64__", BACKGROUND_B64), unsafe_allow_html=True)
