@@ -212,6 +212,11 @@ def eh_jogo_de_cartas(categoria):
     return any(k in c for k in CARTAS_KEYWORDS)
 
 
+def eh_expansao(jogo):
+    blob = f"{jogo.get('categoria', '')} {jogo.get('descricao', '')}".lower()
+    return "expans" in blob
+
+
 def carregar_jogos():
     resp = requests.get(LISTAR_URL, timeout=15)
     resp.raise_for_status()
@@ -390,11 +395,13 @@ def renderizar_lista():
     total_jogos = len(jogos)
     total_mercado = sum(parse_valor(j.get("valor_mercado_estimado")) for j in jogos)
     valor_medio = total_mercado / total_jogos if total_jogos else 0.0
+    total_expansoes = sum(1 for j in jogos if eh_expansao(j))
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("🌰 Jogos na coleção", total_jogos)
     c2.metric("📈 Valor de mercado estimado", f"R$ {total_mercado:,.2f}")
     c3.metric("🌳 Valor médio de mercado por jogo", f"R$ {valor_medio:,.2f}")
+    c4.metric("🍄 Expansões", total_expansoes)
 
     st.divider()
 
