@@ -8,7 +8,7 @@ from streamlit_pdf_viewer import pdf_viewer
 
 st.set_page_config(page_title="Catálogo Bruna BoardGames", page_icon="🎲", layout="wide")
 
-N8N_BASE_URL = st.secrets.get("N8N_BASE_URL", "https://34-30-243-201.sslip.io")
+N8N_BASE_URL = st.secrets.get("N8N_BASE_URL", "https://136-114-39-177.sslip.io")
 LISTAR_URL = f"{N8N_BASE_URL}/webhook/jogos-listar"
 ADICIONAR_URL = f"{N8N_BASE_URL}/webhook/jogos-adicionar"
 EXCLUIR_URL = f"{N8N_BASE_URL}/webhook/jogos-excluir"
