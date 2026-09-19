@@ -57,16 +57,39 @@ h3 {
     padding-bottom: 6px;
     color: #f2c14e;
 }
-.tile-img img {
+.tile-card {
+    position: relative;
+    padding: 8px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, #1c2a22, #131d17);
+    border: 1px solid rgba(242,193,78,0.28);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    margin-bottom: 4px;
+}
+.tile-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+    border-color: rgba(79,209,165,0.6);
+}
+.tile-card::before, .tile-card::after {
+    content: '🌿';
+    position: absolute;
+    font-size: 1.15rem;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+    pointer-events: none;
+    z-index: 2;
+}
+.tile-card::before { top: -9px; left: -7px; transform: rotate(-25deg); }
+.tile-card::after { content: '🍃'; bottom: -8px; right: -7px; transform: rotate(155deg); }
+.tile-img img, .tile-img-placeholder {
     border-radius: 10px;
     width: 100%;
     object-fit: cover;
     aspect-ratio: 1 / 1;
+    display: block;
 }
 .tile-img-placeholder {
-    border-radius: 10px;
-    width: 100%;
-    aspect-ratio: 1 / 1;
     background: #1a2721;
     display: flex;
     align-items: center;
@@ -358,9 +381,9 @@ def renderizar_lista():
         with cols[i % 5]:
             imagem = jogo.get("imagem_url") or ""
             if imagem:
-                st.markdown(f'<div class="tile-img"><img src="{imagem}"></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="tile-card"><div class="tile-img"><img src="{imagem}"></div></div>', unsafe_allow_html=True)
             else:
-                st.markdown('<div class="tile-img-placeholder">🎲</div>', unsafe_allow_html=True)
+                st.markdown('<div class="tile-card"><div class="tile-img-placeholder">🎲</div></div>', unsafe_allow_html=True)
             if st.button(jogo.get("nome", ""), key=f"tile_{jogo.get('id')}", use_container_width=True):
                 st.session_state.jogo_selecionado = jogo.get("id")
                 st.rerun()
