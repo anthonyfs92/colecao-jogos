@@ -30,9 +30,14 @@ PAGE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Alegreya:wght@500;700&display=swap');
 
 :root {
-    --panel-bg: #3d4a44;
-    --panel-bg-2: #46534c;
-    --wood-border: repeating-linear-gradient(135deg, #6b4423 0 6px, #8b5a2b 6px 12px, #4a3018 12px 18px);
+    --panel-bg: #232b27;
+    --panel-bg-2: #2a332e;
+    --wood-border: repeating-linear-gradient(135deg,
+        #3a2513 0px, #6b4423 2px, #a9773e 4px, #c99456 5px, #a9773e 6px, #6b4423 8px, #3a2513 10px);
+    --wood-shadow:
+        inset 0 1.5px 2px rgba(255,214,150,0.25),
+        inset 0 -2px 4px rgba(0,0,0,0.5),
+        0 5px 12px rgba(0,0,0,0.5);
 }
 
 html, body, [class*="css"] {
@@ -65,6 +70,7 @@ div[data-testid="stMetric"] {
     border-radius: 14px;
     padding: 14px 16px;
     position: relative;
+    box-shadow: var(--wood-shadow);
 }
 div[data-testid="stMetric"]::before, div[data-testid="stMetric"]::after {
     content: '🌿';
@@ -89,13 +95,13 @@ h3 {
     background: var(--panel-bg);
     border: 4px solid transparent;
     border-image: var(--wood-border) 6;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    box-shadow: var(--wood-shadow);
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     margin-bottom: 4px;
 }
 .tile-card:hover {
     transform: translateY(-3px) scale(1.015);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+    box-shadow: var(--wood-shadow), 0 10px 24px rgba(0,0,0,0.55);
     filter: brightness(1.12);
 }
 .tile-card::before, .tile-card::after {
@@ -136,12 +142,14 @@ button {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
     border-image: var(--wood-border) 5 !important;
+    box-shadow: var(--wood-shadow) !important;
 }
 div[data-testid="stTextInput"] div[data-baseweb="input"] {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
     border-image: var(--wood-border) 5 !important;
     border-radius: 10px !important;
+    box-shadow: var(--wood-shadow) !important;
 }
 div[data-testid="stTextInput"] input {
     background: transparent !important;
@@ -153,12 +161,14 @@ div[data-testid="stForm"] {
     border-image: var(--wood-border) 7;
     border-radius: 14px;
     padding: 16px;
+    box-shadow: var(--wood-shadow);
 }
 div[data-testid="stExpander"] {
     background: var(--panel-bg);
     border: 4px solid transparent !important;
     border-image: var(--wood-border) 7;
     border-radius: 14px;
+    box-shadow: var(--wood-shadow);
 }
 </style>
 """
@@ -427,7 +437,7 @@ def renderizar_lista():
         termo = busca.strip().lower()
         lista = [j for j in lista if termo in (j.get("nome") or "").lower()]
 
-    lista = sorted(lista, key=lambda j: (j.get("nome") or "").lower())
+    lista = sorted(lista, key=lambda j: parse_valor(j.get("valor_mercado_estimado")), reverse=True)
 
     if not lista:
         st.info("Nenhum jogo encontrado.")
