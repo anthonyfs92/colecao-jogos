@@ -410,13 +410,15 @@ def renderizar_lista():
         return
 
     with st.expander("🌳 Destaques do catálogo"):
-        d1, d2, d3 = st.columns(3)
+        d1, d2, d3, d4 = st.columns(4)
 
         com_valor = [j for j in jogos if parse_valor(j.get("valor_mercado_estimado")) > 0]
         mais_caros = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")), reverse=True)[:5]
         mais_baratos = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")))[:5]
         com_nota = [j for j in jogos if parse_valor(j.get("bgg_nota")) > 0]
         melhor_avaliados = sorted(com_nota, key=lambda j: parse_valor(j.get("bgg_nota")), reverse=True)[:5]
+        com_ano = [j for j in jogos if parse_valor(j.get("ano_publicacao")) > 0]
+        mais_antigos = sorted(com_ano, key=lambda j: parse_valor(j.get("ano_publicacao")))[:5]
 
         with d1:
             st.markdown("**💰 Top 5 valor mais alto**")
@@ -433,6 +435,10 @@ def renderizar_lista():
                     st.markdown(f"- {j.get('nome')} — nota {j.get('bgg_nota')}")
             else:
                 st.caption("Ainda sem notas do BGG cadastradas para nenhum jogo da coleção.")
+        with d4:
+            st.markdown("**🍂 Top 5 mais antigos**")
+            for j in mais_antigos:
+                st.markdown(f"- {j.get('nome')} — {int(parse_valor(j.get('ano_publicacao')))}")
 
     st.divider()
 
