@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 import requests
 from streamlit_pdf_viewer import pdf_viewer
 
-st.set_page_config(page_title="Catálogo Bruna BoardGames", page_icon="🎲", layout="wide")
+st.set_page_config(page_title="Catálogo Bruna BoardGames", page_icon="🌰", layout="wide")
 
 N8N_BASE_URL = st.secrets.get("N8N_BASE_URL", "https://136-114-39-177.sslip.io")
 LISTAR_URL = f"{N8N_BASE_URL}/webhook/jogos-listar"
@@ -53,6 +53,7 @@ html, body, [class*="css"] {
     background-attachment: fixed;
 }
 [data-testid="stHeader"] { background: transparent; }
+div[data-testid="stImage"] { margin-bottom: -18px; }
 h1, h2, h3 {
     font-family: 'Berkshire Swash', cursive !important;
     font-weight: 400;
@@ -98,6 +99,7 @@ h3 {
     box-shadow: var(--wood-shadow);
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     margin-bottom: 4px;
+    isolation: isolate;
 }
 .tile-card:hover {
     transform: translateY(-3px) scale(1.015);
@@ -120,6 +122,10 @@ h3 {
     object-fit: cover;
     aspect-ratio: 1 / 1;
     display: block;
+}
+.tile-img img {
+    mix-blend-mode: multiply;
+    background: var(--panel-bg);
 }
 .tile-img-placeholder {
     background: var(--panel-bg-2);
@@ -144,7 +150,10 @@ button {
     border-image: var(--wood-border) 5 !important;
     box-shadow: var(--wood-shadow) !important;
 }
-div[data-testid="stTextInput"] div[data-baseweb="input"] {
+div[data-testid="stTextInput"] div[data-baseweb="input"],
+div[data-testid="stTextInputRootElement"],
+.stTextInput > div > div,
+div[data-testid="stTextInput"] > div {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
     border-image: var(--wood-border) 5 !important;
@@ -156,19 +165,24 @@ div[data-testid="stTextInput"] input {
     color: #eef5f1 !important;
 }
 div[data-testid="stForm"] {
-    background: var(--panel-bg);
-    border: 4px solid transparent;
-    border-image: var(--wood-border) 7;
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: var(--wood-shadow);
-}
-div[data-testid="stExpander"] {
-    background: var(--panel-bg);
+    background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
-    border-image: var(--wood-border) 7;
-    border-radius: 14px;
-    box-shadow: var(--wood-shadow);
+    border-image: var(--wood-border) 7 !important;
+    border-radius: 14px !important;
+    padding: 16px;
+    box-shadow: var(--wood-shadow) !important;
+}
+div[data-testid="stExpander"],
+div[data-testid="stExpander"] details,
+div[data-testid="stExpander"] > div {
+    background: var(--panel-bg) !important;
+    border: 4px solid transparent !important;
+    border-image: var(--wood-border) 7 !important;
+    border-radius: 14px !important;
+    box-shadow: var(--wood-shadow) !important;
+}
+div[data-testid="stExpander"] summary {
+    background: transparent !important;
 }
 </style>
 """
@@ -267,7 +281,7 @@ def renderizar_detalhe(jogo):
         if imagem:
             st.image(imagem, use_container_width=True)
         else:
-            st.markdown('<div class="tile-img-placeholder">🎲</div>', unsafe_allow_html=True)
+            st.markdown('<div class="tile-img-placeholder">🌰</div>', unsafe_allow_html=True)
 
     with col_info:
         st.title(jogo.get("nome", ""))
@@ -340,16 +354,18 @@ def renderizar_detalhe(jogo):
 
 
 def renderizar_lista():
-    st.image(str(HEADER_IMG), use_container_width=True)
+    col_h1, col_h2, col_h3 = st.columns([1, 5, 1])
+    with col_h2:
+        st.image(str(HEADER_IMG), use_container_width=True)
     st.caption("Cadastre pelo nome — categoria, ano e valor de mercado são buscados automaticamente.")
 
     col_busca, col_add = st.columns([4, 1])
     busca = col_busca.text_input(
         "Buscar na coleção",
-        placeholder="🔍 Buscar pelo nome de um jogo já cadastrado...",
+        placeholder="🌿 Buscar pelo nome de um jogo já cadastrado...",
         label_visibility="collapsed",
     )
-    if col_add.button("➕ Adicionar", use_container_width=True):
+    if col_add.button("🌱 Adicionar", use_container_width=True):
         st.session_state.mostrar_form_adicionar = not st.session_state.get("mostrar_form_adicionar", False)
 
     if st.session_state.get("mostrar_form_adicionar", False):
@@ -373,7 +389,7 @@ def renderizar_lista():
                     except Exception as e:
                         st.error(f"Não consegui adicionar: {e}")
 
-    if st.button("🔄 Atualizar lista"):
+    if st.button("🍃 Atualizar lista"):
         st.session_state.pop("jogos", None)
         st.rerun()
 
@@ -382,9 +398,9 @@ def renderizar_lista():
     valor_medio = total_mercado / total_jogos if total_jogos else 0.0
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("🎲 Jogos na coleção", total_jogos)
+    c1.metric("🌰 Jogos na coleção", total_jogos)
     c2.metric("📈 Valor de mercado estimado", f"R$ {total_mercado:,.2f}")
-    c3.metric("📊 Valor médio de mercado por jogo", f"R$ {valor_medio:,.2f}")
+    c3.metric("🌳 Valor médio de mercado por jogo", f"R$ {valor_medio:,.2f}")
 
     st.divider()
 
@@ -392,7 +408,7 @@ def renderizar_lista():
         st.info("Nenhum jogo cadastrado ainda. Adicione o primeiro usando o formulário acima.")
         return
 
-    with st.expander("📊 Destaques do catálogo"):
+    with st.expander("🌳 Destaques do catálogo"):
         d1, d2, d3 = st.columns(3)
 
         com_valor = [j for j in jogos if parse_valor(j.get("valor_mercado_estimado")) > 0]
@@ -450,7 +466,7 @@ def renderizar_lista():
             if imagem:
                 st.markdown(f'<div class="tile-card"><div class="tile-img"><img src="{imagem}"></div></div>', unsafe_allow_html=True)
             else:
-                st.markdown('<div class="tile-card"><div class="tile-img-placeholder">🎲</div></div>', unsafe_allow_html=True)
+                st.markdown('<div class="tile-card"><div class="tile-img-placeholder">🌰</div></div>', unsafe_allow_html=True)
             if st.button(jogo.get("nome", ""), key=f"tile_{jogo.get('id')}", use_container_width=True):
                 st.session_state.jogo_selecionado = jogo.get("id")
                 st.rerun()
