@@ -410,7 +410,7 @@ def renderizar_lista():
         return
 
     with st.expander("🌳 Destaques do catálogo"):
-        d1, d2, d3, d4 = st.columns(4)
+        d1, d2, d3, d4, d5 = st.columns(5)
 
         com_valor = [j for j in jogos if parse_valor(j.get("valor_mercado_estimado")) > 0]
         mais_caros = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")), reverse=True)[:5]
@@ -419,6 +419,7 @@ def renderizar_lista():
         melhor_avaliados = sorted(com_nota, key=lambda j: parse_valor(j.get("bgg_nota")), reverse=True)[:5]
         com_ano = [j for j in jogos if parse_valor(j.get("ano_publicacao")) > 0]
         mais_antigos = sorted(com_ano, key=lambda j: parse_valor(j.get("ano_publicacao")))[:5]
+        mais_novos = sorted(com_ano, key=lambda j: parse_valor(j.get("ano_publicacao")), reverse=True)[:5]
 
         with d1:
             st.markdown("**💰 Top 5 valor mais alto**")
@@ -438,6 +439,10 @@ def renderizar_lista():
         with d4:
             st.markdown("**🍂 Top 5 mais antigos**")
             for j in mais_antigos:
+                st.markdown(f"- {j.get('nome')} — {int(parse_valor(j.get('ano_publicacao')))}")
+        with d5:
+            st.markdown("**🌱 Top 5 mais novos**")
+            for j in mais_novos:
                 st.markdown(f"- {j.get('nome')} — {int(parse_valor(j.get('ano_publicacao')))}")
 
     st.divider()
