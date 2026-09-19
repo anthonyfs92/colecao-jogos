@@ -67,7 +67,7 @@ h1, h2, h3 {
 div[data-testid="stMetric"] {
     background: var(--panel-bg);
     border: 4px solid transparent;
-    border-image: var(--wood-border) 7;
+    border-image: var(--wood-border) 6;
     border-radius: 14px;
     padding: 14px 16px;
     position: relative;
@@ -124,7 +124,6 @@ h3 {
     display: block;
 }
 .tile-img img {
-    mix-blend-mode: multiply;
     background: var(--panel-bg);
 }
 .tile-img-placeholder {
@@ -147,7 +146,7 @@ button {
     border-radius: 10px !important;
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
-    border-image: var(--wood-border) 5 !important;
+    border-image: var(--wood-border) 6 !important;
     box-shadow: var(--wood-shadow) !important;
 }
 div[data-testid="stTextInput"] div[data-baseweb="input"],
@@ -156,7 +155,7 @@ div[data-testid="stTextInputRootElement"],
 div[data-testid="stTextInput"] > div {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
-    border-image: var(--wood-border) 5 !important;
+    border-image: var(--wood-border) 6 !important;
     border-radius: 10px !important;
     box-shadow: var(--wood-shadow) !important;
 }
@@ -167,7 +166,7 @@ div[data-testid="stTextInput"] input {
 div[data-testid="stForm"] {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
-    border-image: var(--wood-border) 7 !important;
+    border-image: var(--wood-border) 6 !important;
     border-radius: 14px !important;
     padding: 16px;
     box-shadow: var(--wood-shadow) !important;
@@ -177,7 +176,7 @@ div[data-testid="stExpander"] details,
 div[data-testid="stExpander"] > div {
     background: var(--panel-bg) !important;
     border: 4px solid transparent !important;
-    border-image: var(--wood-border) 7 !important;
+    border-image: var(--wood-border) 6 !important;
     border-radius: 14px !important;
     box-shadow: var(--wood-shadow) !important;
 }
