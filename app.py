@@ -1,4 +1,5 @@
 import base64
+from collections import Counter
 from pathlib import Path
 
 import streamlit as st
@@ -410,7 +411,7 @@ def renderizar_lista():
         return
 
     with st.expander("🌳 Destaques do catálogo"):
-        d1, d2, d3, d4, d5 = st.columns(5)
+        d1, d2, d3, d4, d5, d6 = st.columns(6)
 
         com_valor = [j for j in jogos if parse_valor(j.get("valor_mercado_estimado")) > 0]
         mais_caros = sorted(com_valor, key=lambda j: parse_valor(j.get("valor_mercado_estimado")), reverse=True)[:5]
@@ -420,6 +421,10 @@ def renderizar_lista():
         com_ano = [j for j in jogos if parse_valor(j.get("ano_publicacao")) > 0]
         mais_antigos = sorted(com_ano, key=lambda j: parse_valor(j.get("ano_publicacao")))[:5]
         mais_novos = sorted(com_ano, key=lambda j: parse_valor(j.get("ano_publicacao")), reverse=True)[:5]
+        contagem_editoras = Counter(
+            j.get("editora", "").strip() for j in jogos if j.get("editora", "").strip()
+        )
+        top_editoras = contagem_editoras.most_common(5)
 
         with d1:
             st.markdown("**💰 Top 5 valor mais alto**")
@@ -444,6 +449,10 @@ def renderizar_lista():
             st.markdown("**🌱 Top 5 mais novos**")
             for j in mais_novos:
                 st.markdown(f"- {j.get('nome')} — {int(parse_valor(j.get('ano_publicacao')))}")
+        with d6:
+            st.markdown("**🏭 Top 5 editoras**")
+            for editora, qtd in top_editoras:
+                st.markdown(f"- {editora} — {qtd} jogo{'s' if qtd != 1 else ''}")
 
     st.divider()
 
